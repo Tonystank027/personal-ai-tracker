@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. - Personal AI Agent</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <!-- JARVIS Loading Screen -->
+    <div id="jarvis-loader" class="jarvis-loader">
+        <div class="arc-reactor">
+            <div class="reactor-ring ring-1"></div>
+            <div class="reactor-ring ring-2"></div>
+            <div class="reactor-ring ring-3"></div>
+            <div class="reactor-ring ring-4"></div>
+            <div class="reactor-core"></div>
+        </div>
+        <div class="loading-text">
+            <span class="loading-line">J.A.R.V.I.S. Initializing...</span>
+            <span class="loading-dots"></span>
+        </div>
+        <div class="system-status">
+            <div class="status-bar"><div class="status-fill"></div></div>
+            <span class="status-text">Loading Systems</span>
+        </div>
+    </div>
+
+    <!-- Particle Background -->
+    <div class="particles" id="particles"></div>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="arc-reactor-mini"></div>
+                <h1><span class="glitch-text" data-text="J.A.R.V.I.S.">J.A.R.V.I.S.</span></h1>
+                <p class="logo-subtitle">Just A Rather Very Intelligent System</p>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-view="tasks">
+                    <span class="icon">✅</span>
+                    <span>Tasks</span>
+                </a>
+                <a href="#" class="nav-item" data-view="notes">
+                    <span class="icon">📝</span>
+                    <span>Notes</span>
+                </a>
+                <a href="#" class="nav-item" data-view="chat">
+                    <span class="icon">💬</span>
+                    <span>AI Chat</span>
+                </a>
+                <a href="#" class="nav-item" data-view="planner">
+                    <span class="icon">📅</span>
+                    <span>Planner</span>
+                </a>
+                <a href="#" class="nav-item" data-view="settings">
+                    <span class="icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-btn">
+                    <span class="icon">🌙</span>
+                    <span>Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <div class="header-left">
+                    <h2 id="page-title">Dashboard</h2>
+                    <p id="current-date"></p>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <input type="text" id="global-search" placeholder="Search tasks, notes...">
+                    </div>
+                    <button id="notification-btn" class="icon-btn" title="Notifications">
+                        🔔 <span class="badge" id="notification-badge">0</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="dashboard-view" class="view active">
+                <div class="dashboard-grid">
+                    <!-- Stats Cards -->
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <h3 id="total-tasks">0</h3>
+                            <p>Total Tasks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3 id="completed-tasks">0</h3>
+                            <p>Completed</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-info">
+                            <h3 id="pending-tasks">0</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-info">
+                            <h3 id="high-priority">0</h3>
+                            <p>High Priority</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="chart-container">
+                        <h3>Productivity Overview</h3>
+                        <div class="charts-grid">
+                            <div class="chart-box">
+                                <canvas id="tasks-chart"></canvas>
+                            </div>
+                            <div class="chart-box">
+                                <canvas id="priority-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Tasks & Progress -->
+                    <div class="dashboard-row">
+                        <div class="panel">
+                            <h3>Today's Tasks</h3>
+                            <ul id="today-tasks-list" class="task-list"></ul>
+                        </div>
+                        <div class="panel">
+                            <h3>Progress</h3>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div id="completion-bar" class="progress-fill"></div>
+                                </div>
+                                <p id="completion-text">0% Complete</p>
+                            </div>
+                            <div class="mini-calendar" id="mini-calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tasks View -->
+            <section id="tasks-view" class="view">
+                <div class="tasks-header">
+                    <button id="add-task-btn" class="primary-btn">+ Add Task</button>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="today">Today</button>
+                        <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+                </div>
+                <div id="tasks-container" class="tasks-container"></div>
+            </section>
+
+            <!-- Notes View -->
+            <section id="notes-view" class="view">
+                <div class="notes-header">
+                    <button id="add-note-btn" class="primary-btn">+ New Note</button>
+                    <input type="text" id="notes-search" placeholder="Search notes..." class="search-input">
+                </div>
+                <div id="notes-container" class="notes-grid"></div>
+            </section>
+
+            <!-- Chat View -->
+            <section id="chat-view" class="view">
+                <div class="chat-container">
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Ask me anything about your tasks, notes, schedule...">
+                        <button id="send-chat-btn" class="send-btn">Send</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Planner View -->
+            <section id="planner-view" class="view">
+                <div class="planner-header">
+                    <h3>Daily Schedule</h3>
+                    <button id="generate-schedule-btn" class="primary-btn">Generate Schedule</button>
+                </div>
+                <div id="schedule-container" class="schedule-container"></div>
+            </section>
+
+            <!-- Settings View -->
+            <section id="settings-view" class="view">
+                <div class="settings-container">
+                    <div class="settings-group">
+                        <h3>🎨 Theme</h3>
+                        <label class="toggle-label">
+                            <span>Dark Mode</span>
+                            <label class="toggle">
+                                <input type="checkbox" id="dark-mode-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🤖 AI Settings (Completions.me - Free)</h3>
+                        <p class="help-text" style="margin-bottom: 1rem;">
+                            Enable real AI responses using Completions.me free API.
+                            <a href="https://completions.me/" target="_blank" style="color: var(--accent-primary);">Get your free API key here</a>.
+                        </p>
+                        <div class="form-group">
+                            <label for="claude-api-key">API Key</label>
+                            <input type="password" id="claude-api-key" placeholder="Enter your API key">
+                        </div>
+                        <div class="data-actions" style="margin-top: 1rem;">
+                            <button id="save-api-key-btn" class="primary-btn">Save API Key</button>
+                            <button id="test-api-key-btn" class="secondary-btn">Test Connection</button>
+                            <button id="clear-api-key-btn" class="secondary-btn" style="border-color: var(--danger); color: var(--danger);">Clear Key</button>
+                        </div>
+                        <div id="api-status" class="help-text" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>🔔 Notifications</h3>
+                        <button id="enable-notifications-btn" class="primary-btn">Enable Notifications</button>
+                        <p class="help-text">Get browser notifications for task reminders</p>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>💾 Data Management</h3>
+                        <div class="data-actions">
+                            <button id="export-data-btn" class="secondary-btn">📥 Export Data (JSON)</button>
+                            <button id="import-data-btn" class="secondary-btn">📤 Import Data</button>
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="settings-group danger">
+                        <h3>⚠️ Danger Zone</h3>
+                        <button id="clear-all-data-btn" class="danger-btn">Clear All Data</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="task-modal-title">Add New Task</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label for="task-title">Task Title</label>
+                    <input type="text" id="task-title" required placeholder="Enter task title">
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" rows="3" placeholder="Enter task description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-priority">Priority</label>
+                        <select id="task-priority">
+                            <option value="high">🔴 High</option>
+                            <option value="medium" selected>🟡 Medium</option>
+                            <option value="low">🟢 Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-category">Category</label>
+                        <input type="text" id="task-category" placeholder="e.g., Work, Personal">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-deadline">Deadline</label>
+                        <input type="datetime-local" id="task-deadline">
+                    </div>
+                    <div class="form-group">
+                        <label for="task-reminder">Reminder</label>
+                        <input type="checkbox" id="task-reminder"> Enable reminder
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="secondary-btn cancel-btn">Cancel</button>
+                    <button type="submit" class="primary-btn">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="note-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="note-modal-title">New Note</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="note-form">
+                <input type="hidden" id="note-id">
+                <div class="form-group">
+                    <label for="note-title">Title</label>
+                    <input type="text" id="note-title" required placeholder="Note title">
+                </div>
+                <div class="form-group">
+                    <label for="note-content">Content</label>
+                    <textarea id="note-content" rows="8" required placeholder="Write your note..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="note-tags">Tags (comma separated)</label>
+                    <input type="text" id="note-tags" placeholder="e.g., ideas, work, important">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="secondary-btn cancel-btn">Cancel</button>
+                    <button type="submit" class="primary-btn">Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
